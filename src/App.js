@@ -1,54 +1,103 @@
 import React, { useState } from "react";
-import Datatable from './components/datatable.js';
-import Searchbar from './components/searchbar.js';
 
-
+import './App.css';
+import Searchbar from './components/Searchbar.js';
+import Item from './components/datalist.js';
+import AddRow from './components/AddRow.js';
 
 
 function App(props) {
-var term=''
-const [data,updateData]=useState(props.data)
-var data_new=data
-const [display_data,update_display_data]=useState(data)
+
+  const [data,updateData]=useState(props.data)
+ 
+
+  const [fdata,setfdata]=useState(data)
+  const data1=data
+
+ 
 
 
-function finalsearch(searchterm){
-  if(searchterm!==''){
-    term=searchterm
-  }
-  else{
-    term=''
-  }
-const filtered_data=data.filter(element=>{
-  if(term!==''){
+	const list=fdata.map(item=>(
+
+
+
+		<Item name={item.name}
+			  country={item.country}
+			  club={item.club}
+		/>
+
+		)
+
+	)
+
+
+  function filter(term){
+    const fildata=data.filter(function(element){
+      if (term){
       return(
-      element[0].toLowerCase().startsWith(term.toLowerCase()) ||
-      element[1].toLowerCase().startsWith(term.toLowerCase()) || 
-      element[2].toLowerCase().startsWith(term.toLowerCase())
+
+      element.name.toLowerCase().startsWith(term.toLowerCase()) ||
+      element.club.toLowerCase().startsWith(term.toLowerCase()) || 
+      element.country.toLowerCase().startsWith(term.toLowerCase())
+
       )
+    }
+    else{
+      return(true)
+    }
+
+
+    })
+    setfdata(fildata)
+
   }
-  else{
-    return true
+
+  function submitfunc(e,term){
+    e.preventDefault()
+    
+    filter(term)
+
   }
 
-  })
+  function rowadder(terms){
+    data1.unshift(terms)
+    updateData(data1)
+    setfdata(data1)
+    filter('')
+    
+  }
 
-update_display_data(filtered_data)
+
+const th=Object.keys(data[0]).map(col=>(
+<th class='data'>{col.toUpperCase()}</th>
+      
 
 
-}
-
-
-
+  ))
 
   return (
 
-<div>
-<Searchbar searchfunc={finalsearch}/>
-<Datatable data={display_data}/><br/>
-</div>
+  	<div class='main'>
+    <Searchbar submitfunc={submitfunc}/><br/><br/><br/>
+    <AddRow dats={data[0]} submit={rowadder}/><br/>
+    <table class='datatable' >
 
-)
+    <div>
+    <tr class='datarow'>
+     {th}
+    </tr>
+
+    <hr size='2'/>
+    </div>
+
+
+
+
+    {list}
+    </table>
+
+    </div>
+  );
     }
 
 
